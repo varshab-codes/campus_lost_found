@@ -1,0 +1,647 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campus Lost & Found</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f7fb;
+    color: #1e293b;
+}
+
+header {
+    background: #173b70;
+    color: white;
+    padding: 25px 8%;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    color: #dbeafe;
+}
+
+nav {
+    background: white;
+    padding: 15px 8%;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 6px #0001;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 11px 17px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+button.secondary {
+    background: #64748b;
+}
+
+button.green {
+    background: #15803d;
+}
+
+button.red {
+    background: #dc2626;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.welcome {
+    margin-bottom: 25px;
+}
+
+.welcome h2 {
+    color: #173b70;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.stat {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #0001;
+}
+
+.stat p {
+    color: #64748b;
+}
+
+.stat h2 {
+    color: #2563eb;
+    margin-bottom: 0;
+}
+
+.panel {
+    background: white;
+    padding: 22px;
+    border-radius: 10px;
+    margin-bottom: 22px;
+    box-shadow: 0 2px 8px #0001;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+label {
+    display: block;
+    margin: 10px 0 6px;
+    font-weight: bold;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font: inherit;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.form-buttons {
+    margin-top: 18px;
+    display: flex;
+    gap: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+.filters {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 12px;
+    margin: 15px 0;
+}
+
+.items {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.item-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    padding: 17px;
+    background: white;
+}
+
+.item-card h3 {
+    margin: 10px 0;
+}
+
+.tag {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1d4ed8;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.tag.found {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.tag.returned {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.item-card p {
+    color: #64748b;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.card-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.card-buttons button {
+    font-size: 12px;
+}
+
+.empty {
+    text-align: center;
+    color: #64748b;
+    padding: 30px;
+    grid-column: 1 / -1;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    background: #173b70;
+    color: white;
+    margin-top: 40px;
+}
+
+@media(max-width: 650px) {
+    .stats, .items, .form-grid, .filters {
+        grid-template-columns: 1fr;
+    }
+
+    header {
+        padding: 22px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Campus Lost & Found</h1>
+    <p>A simple way to find and return lost belongings on campus.</p>
+</header>
+
+<nav>
+    <button onclick="showForm('Lost')">
+        Report Lost Item
+    </button>
+
+    <button class="green" onclick="showForm('Found')">
+        Report Found Item
+    </button>
+
+    <button class="secondary" onclick="showAll()">
+        View All Items
+    </button>
+</nav>
+
+<div class="container">
+
+    <section class="welcome">
+        <h2>Welcome to Campus Lost & Found!</h2>
+        <p>Lost something? Found something? Help reunite
+           belongings with their owners.</p>
+    </section>
+
+    <section class="stats">
+        <div class="stat">
+            <p>Total Reports</p>
+            <h2 id="total">0</h2>
+        </div>
+
+        <div class="stat">
+            <p>Lost Items</p>
+            <h2 id="lostCount">0</h2>
+        </div>
+
+        <div class="stat">
+            <p>Found Items</p>
+            <h2 id="foundCount">0</h2>
+        </div>
+    </section>
+
+    <section class="panel hidden" id="formPanel">
+        <h2 id="formTitle">Report an Item</h2>
+
+        <form id="itemForm">
+
+            <div class="form-grid">
+
+                <div>
+                    <label>Report Type</label>
+                    <select id="type" required>
+                        <option value="Lost">Lost Item</option>
+                        <option value="Found">Found Item</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Item Name</label>
+                    <input id="itemName"
+                           placeholder="Example: College ID Card"
+                           required>
+                </div>
+
+                <div>
+                    <label>Category</label>
+                    <select id="category" required>
+                        <option value="">Select Category</option>
+                        <option value="ID Card">ID Card</option>
+                        <option>Books</option>
+                        <option>Electronics</option>
+                        <option>Bags</option>
+                        <option>Water Bottles</option>
+                        <option>Keys</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Location</label>
+                    <input id="location"
+                           placeholder="Example: Library"
+                           required>
+                </div>
+
+                <div>
+                    <label>Date</label>
+                    <input type="date" id="date" required>
+                </div>
+
+                <div>
+                    <label>Your Name</label>
+                    <input id="reporter"
+                           placeholder="Enter your name"
+                           required>
+                </div>
+
+            </div>
+
+            <label>Description</label>
+            <textarea id="description" rows="3"
+                placeholder="Describe the item..." required></textarea>
+
+            <label>Contact Details</label>
+            <input id="contact"
+                   placeholder="Email or phone number"
+                   required>
+
+            <div class="form-buttons">
+                <button type="submit">Submit Report</button>
+                <button type="button" class="secondary"
+                    onclick="hideForm()">Cancel</button>
+            </div>
+
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2>Browse Reports</h2>
+
+        <div class="filters">
+            <input type="text" id="search"
+                placeholder="Search item name or location...">
+
+            <select id="filter">
+                <option value="All">All Reports</option>
+                <option value="Lost">Lost Items</option>
+                <option value="Found">Found Items</option>
+            </select>
+        </div>
+
+        <div class="items" id="items"></div>
+    </section>
+
+</div>
+
+<footer>
+    <p>Campus Lost & Found Portal</p>
+    <p>Helping students recover their belongings.</p>
+</footer>
+
+<script>
+
+// Get existing reports from browser storage
+let reports = JSON.parse(
+    localStorage.getItem("campusReports")
+);
+
+if (!reports) {
+    reports = [
+        {
+            id: 1,
+            type: "Lost",
+            name: "College ID Card",
+            category: "ID Card",
+            location: "College Library",
+            date: "2026-11-09",
+            reporter: "Sample Student",
+            description: "Blue college ID card.",
+            contact: "demo@example.com",
+            status: "Active"
+        },
+        {
+            id: 2,
+            type: "Found",
+            name: "Water Bottle",
+            category: "Water Bottles",
+            location: "Canteen",
+            date: "2026-11-09",
+            reporter: "Demo User",
+            description: "Black water bottle.",
+            contact: "demo@example.com",
+            status: "Active"
+        }
+    ];
+
+    saveReports();
+}
+
+// Save reports
+function saveReports() {
+    localStorage.setItem(
+        "campusReports",
+        JSON.stringify(reports)
+    );
+}
+
+// Open report form
+function showForm(type) {
+    document.getElementById("formPanel")
+        .classList.remove("hidden");
+
+    document.getElementById("type").value = type;
+
+    document.getElementById("formTitle").textContent =
+        "Report " + type + " Item";
+
+    document.getElementById("date").value =
+        new Date().toISOString().slice(0, 10);
+
+    document.getElementById("formPanel")
+        .scrollIntoView({ behavior: "smooth" });
+}
+
+// Hide form
+function hideForm() {
+    document.getElementById("formPanel")
+        .classList.add("hidden");
+}
+
+// Submit a report
+document.getElementById("itemForm")
+.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const report = {
+        id: Date.now(),
+        type: document.getElementById("type").value,
+        name: document.getElementById("itemName").value.trim(),
+        category: document.getElementById("category").value,
+        location: document.getElementById("location").value.trim(),
+        date: document.getElementById("date").value,
+        reporter: document.getElementById("reporter").value.trim(),
+        description: document.getElementById("description").value.trim(),
+        contact: document.getElementById("contact").value.trim(),
+        status: "Active"
+    };
+
+    reports.unshift(report);
+
+    saveReports();
+
+    this.reset();
+    hideForm();
+    displayReports();
+
+    alert("Your report was submitted successfully!");
+
+});
+
+// Display reports
+function displayReports() {
+
+    const container = document.getElementById("items");
+
+    const keyword =
+        document.getElementById("search").value.toLowerCase();
+
+    const selected =
+        document.getElementById("filter").value;
+
+    const filtered = reports.filter(report => {
+
+        const matchesSearch =
+            report.name.toLowerCase().includes(keyword) ||
+            report.location.toLowerCase().includes(keyword) ||
+            report.category.toLowerCase().includes(keyword);
+
+        const matchesType =
+            selected === "All" || report.type === selected;
+
+        return matchesSearch && matchesType;
+    });
+
+    document.getElementById("total").textContent =
+        reports.length;
+
+    document.getElementById("lostCount").textContent =
+        reports.filter(r => r.type === "Lost").length;
+
+    document.getElementById("foundCount").textContent =
+        reports.filter(r => r.type === "Found").length;
+
+    container.innerHTML = "";
+
+    if (filtered.length === 0) {
+        container.innerHTML =
+            '<p class="empty">No matching reports found.</p>';
+        return;
+    }
+
+    filtered.forEach(report => {
+
+        const card = document.createElement("div");
+        card.className = "item-card";
+
+        const title = document.createElement("h3");
+        title.textContent = report.name;
+
+        const tag = document.createElement("span");
+        tag.className = report.status === "Returned"
+            ? "tag returned"
+            : report.type === "Found" ? "tag found" : "tag";
+
+        tag.textContent = report.status === "Returned"
+            ? "Returned"
+            : report.type + " Item";
+
+        const details = document.createElement("p");
+        details.textContent =
+            "Category: " + report.category +
+            " | Location: " + report.location +
+            " | Date: " + report.date;
+
+        const description = document.createElement("p");
+        description.textContent = report.description;
+
+        const reporter = document.createElement("p");
+        reporter.textContent =
+            "Reported by: " + report.reporter;
+
+        const contact = document.createElement("p");
+        contact.textContent =
+            "Contact: " + report.contact;
+
+        const actions = document.createElement("div");
+        actions.className = "card-buttons";
+
+        if (report.status === "Active") {
+
+            const returned = document.createElement("button");
+            returned.className = "green";
+            returned.textContent = "Mark Returned";
+
+            returned.onclick = function() {
+                markReturned(report.id);
+            };
+
+            actions.appendChild(returned);
+        }
+
+        const remove = document.createElement("button");
+        remove.className = "red";
+        remove.textContent = "Delete";
+
+        remove.onclick = function() {
+            deleteReport(report.id);
+        };
+
+        actions.appendChild(remove);
+
+        card.append(
+            tag, title, details, description,
+            reporter, contact, actions
+        );
+
+        container.appendChild(card);
+    });
+
+}
+
+// Search reports
+document.getElementById("search")
+.addEventListener("input", displayReports);
+
+// Filter reports
+document.getElementById("filter")
+.addEventListener("change", displayReports);
+
+// Mark item as returned
+function markReturned(id) {
+
+    reports = reports.map(report => {
+
+        if (report.id === id) {
+            return { ...report, status: "Returned" };
+        }
+
+        return report;
+    });
+
+    saveReports();
+    displayReports();
+}
+
+// Delete report
+function deleteReport(id) {
+
+    if (!confirm("Delete this report?")) {
+        return;
+    }
+
+    reports = reports.filter(report => report.id !== id);
+
+    saveReports();
+    displayReports();
+}
+
+// View all reports
+function showAll() {
+
+    document.getElementById("search").value = "";
+    document.getElementById("filter").value = "All";
+
+    displayReports();
+
+}
+
+// Initial display
+displayReports();
+
+</script>
+
+</body>
+</html>
